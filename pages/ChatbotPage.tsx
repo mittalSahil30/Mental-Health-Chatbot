@@ -1,11 +1,8 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PaperAirplaneIcon, UserCircleIcon, SparklesIcon } from '@heroicons/react/24/solid';
-import { createChatSession } from '../services/geminiService';
-import type { Chat } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
-import { useJournal } from '../contexts/JournalContext';
-import { useTest } from '../contexts/TestContext';
+import { chatAPI } from '../services/api';
 import Markdown from 'react-markdown';
 
 
@@ -18,73 +15,78 @@ const ChatbotPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatRef = useRef<Chat | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { user, isGuest } = useAuth();
-  const { entries: journalEntries } = useJournal();
-  const { getLatestResult } = useTest();
+  const { user } = useAuth();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    initializeChat();
-  }, [user]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+    // Load chat history when component mounts
+    loadChatHistory();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const initializeChat = useCallback(() => {
-    if (user) {
-        const latestJournalEntry = journalEntries.length > 0 ? journalEntries[0] : undefined;
-        const latestTestResult = getLatestResult();
-        
-        chatRef.current = createChatSession({
-            userName: user.name,
-            isGuest,
-            latestJournalEntry,
-            latestTestResult,
-        });
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
+  const loadChatHistory = async () => {
+    try {
+      const response = await chatAPI.getHistory(1, 50);
+      const historicalMessages: Message[] = [];
+      
+      // Convert chat history to messages format (reverse to show oldest first)
+      response.chats.reverse().forEach(chat => {
+        historicalMessages.push({ sender: 'user', text: chat.message });
+        historicalMessages.push({ sender: 'bot', text: chat.response });
+      });
+
+      if (historicalMessages.length === 0) {
+        // Welcome message if no history
         setMessages([
-            { sender: 'bot', text: `Hello ${user.name}! I'm Serene, your personal AI companion for mental wellness. How are you feeling today?` }
+          { sender: 'bot', text: `Hello ${user?.name || 'there'}! I'm Serene, your personal AI companion for mental wellness. How are you feeling today?` }
         ]);
+      } else {
+        setMessages(historicalMessages);
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+      // Show welcome message on error
+      setMessages([
+        { sender: 'bot', text: `Hello ${user?.name || 'there'}! I'm Serene, your personal AI companion for mental wellness. How are you feeling today?` }
+      ]);
     }
-  }, [user, isGuest, journalEntries, getLatestResult]);
-
+  };
 
   const handleSend = async () => {
     if (input.trim() === '' || isLoading) return;
 
     const userMessage: Message = { sender: 'user', text: input };
+    const currentInput = input;
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     // Add a placeholder for the bot's response
-    setMessages(prev => [...prev, { sender: 'bot', text: '' }]);
+    setMessages(prev => [...prev, { sender: 'bot', text: '...' }]);
 
     try {
-      if (chatRef.current) {
-        const stream = await chatRef.current.sendMessageStream({ message: input });
-        let botResponseText = '';
-        for await (const chunk of stream) {
-            botResponseText += chunk.text;
-            setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1] = { sender: 'bot', text: botResponseText };
-                return newMessages;
-            });
-        }
-      }
-    } catch (error) {
-      console.error('Error sending message to Gemini:', error);
+      const response = await chatAPI.sendMessage(currentInput);
+      
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = { sender: 'bot', text: 'Sorry, I encountered an error. Please try again.' };
+        newMessages[newMessages.length - 1] = { sender: 'bot', text: response.response };
+        return newMessages;
+      });
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = { 
+          sender: 'bot', 
+          text: 'Sorry, I encountered an error. Please try again. Make sure the backend server is running and the Gemini API key is configured.' 
+        };
         return newMessages;
       });
     } finally {
