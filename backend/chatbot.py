@@ -8,11 +8,18 @@ load_dotenv()
 
 # Configure Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-pro')
+if GEMINI_API_KEY and GEMINI_API_KEY != "your-gemini-api-key-here":
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        # Use the correct model name for the current API version
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        print("Gemini API configured successfully")
+    except Exception as e:
+        print(f"Error configuring Gemini API: {e}")
+        model = None
 else:
     model = None
+    print("Gemini API not configured - using fallback responses")
 
 def get_chatbot_response(
     user_message: str,
