@@ -1,8 +1,25 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PhoneIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/solid';
+import { getSos } from '../api/misc';
 
 const SosPage: React.FC = () => {
+  const [hotlines, setHotlines] = useState<any[]>([]);
+  const [emails, setEmails] = useState<any[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getSos();
+        setHotlines(res.hotlines || []);
+        setEmails(res.emails || []);
+      } catch {
+        setHotlines([]);
+        setEmails([]);
+      }
+    })();
+  }, []);
+
   return (
     <div className="p-6 bg-white dark:bg-neutral rounded-lg shadow-md h-full">
       <h1 className="text-3xl font-bold text-red-500 mb-4">Immediate Help</h1>
@@ -11,42 +28,31 @@ const SosPage: React.FC = () => {
       </p>
 
       <div className="space-y-6">
-        <div className="p-6 border border-red-200 dark:border-red-800 rounded-lg bg-red-50 dark:bg-red-900/20">
-          <h2 className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-2">National Suicide Prevention Lifeline</h2>
-          <div className="flex items-center space-x-4 text-lg">
-            <PhoneIcon className="h-6 w-6 text-red-500" />
-            <a href="tel:988" className="font-bold text-red-700 dark:text-red-300 hover:underline">988</a>
+        {hotlines.map((h) => (
+          <div key={h.name} className="p-6 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <h2 className="text-2xl font-semibold mb-2">{h.name}</h2>
+            <div className="flex items-center space-x-4 text-lg">
+              {h.phone && <><PhoneIcon className="h-6 w-6" /><a href={`tel:${h.phone}`} className="font-bold hover:underline">{h.phone}</a></>}
+              {h.text && <><EnvelopeIcon className="h-6 w-6" /><span className="font-bold">{h.text}</span></>}
+              {h.url && <><GlobeAltIcon className="h-6 w-6" /><a href={h.url} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline">Visit Website</a></>}
+            </div>
           </div>
-        </div>
-        
-        <div className="p-6 border border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-          <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2">Crisis Text Line</h2>
-          <div className="flex items-center space-x-4 text-lg">
-            <EnvelopeIcon className="h-6 w-6 text-blue-500" />
-            <p className="font-bold text-blue-700 dark:text-blue-300">Text HOME to 741741</p>
-          </div>
-        </div>
+        ))}
 
-        <div className="p-6 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-900/20">
-          <h2 className="text-2xl font-semibold text-green-600 dark:text-green-400 mb-2">The Trevor Project (for LGBTQ Youth)</h2>
-           <div className="flex items-center space-x-4 text-lg mb-2">
-            <PhoneIcon className="h-6 w-6 text-green-500" />
-            <a href="tel:1-866-488-7386" className="font-bold text-green-700 dark:text-green-300 hover:underline">1-866-488-7386</a>
+        {emails.length > 0 && (
+          <div className="p-6 border rounded-lg bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+            <h2 className="text-2xl font-semibold mb-2">Important Emails</h2>
+            <ul className="space-y-2">
+              {emails.map((e) => (
+                <li key={e.email} className="flex items-center space-x-4">
+                  <EnvelopeIcon className="h-6 w-6" />
+                  <span className="font-bold">{e.name}:</span>
+                  <a href={`mailto:${e.email}`} className="hover:underline">{e.email}</a>
+                </li>
+              ))}
+            </ul>
           </div>
-           <div className="flex items-center space-x-4 text-lg">
-            <GlobeAltIcon className="h-6 w-6 text-green-500" />
-             <a href="https://www.thetrevorproject.org/" target="_blank" rel="noopener noreferrer" className="font-bold text-green-700 dark:text-green-300 hover:underline">Visit Website</a>
-          </div>
-        </div>
-        
-        <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <h2 className="text-2xl font-semibold text-gray-600 dark:text-gray-400 mb-2">Local Emergency Services</h2>
-           <div className="flex items-center space-x-4 text-lg">
-            <PhoneIcon className="h-6 w-6 text-gray-500" />
-            <a href="tel:911" className="font-bold text-gray-700 dark:text-gray-300 hover:underline">Call 911</a>
-          </div>
-        </div>
-
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PaperAirplaneIcon, UserCircleIcon, SparklesIcon } from '@heroicons/react/24/solid';
-import { createChatSession } from '../services/geminiService';
-import type { Chat } from '@google/genai';
+import { streamChat } from '../api/chat';
 import { useAuth } from '../contexts/AuthContext';
 import { useJournal } from '../contexts/JournalContext';
 import { useTest } from '../contexts/TestContext';
@@ -18,7 +17,7 @@ const ChatbotPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatRef = useRef<Chat | null>(null);
+  const chatRef = useRef<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, isGuest } = useAuth();
   const { entries: journalEntries } = useJournal();
@@ -39,15 +38,7 @@ const ChatbotPage: React.FC = () => {
 
   const initializeChat = useCallback(() => {
     if (user) {
-        const latestJournalEntry = journalEntries.length > 0 ? journalEntries[0] : undefined;
-        const latestTestResult = getLatestResult();
-        
-        chatRef.current = createChatSession({
-            userName: user.name,
-            isGuest,
-            latestJournalEntry,
-            latestTestResult,
-        });
+        chatRef.current = true;
 
         setMessages([
             { sender: 'bot', text: `Hello ${user.name}! I'm Serene, your personal AI companion for mental wellness. How are you feeling today?` }
@@ -69,16 +60,15 @@ const ChatbotPage: React.FC = () => {
 
     try {
       if (chatRef.current) {
-        const stream = await chatRef.current.sendMessageStream({ message: input });
         let botResponseText = '';
-        for await (const chunk of stream) {
-            botResponseText += chunk.text;
-            setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1] = { sender: 'bot', text: botResponseText };
-                return newMessages;
-            });
-        }
+        await streamChat(input, (chunk) => {
+          botResponseText += chunk;
+          setMessages(prev => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = { sender: 'bot', text: botResponseText };
+            return newMessages;
+          });
+        });
       }
     } catch (error) {
       console.error('Error sending message to Gemini:', error);

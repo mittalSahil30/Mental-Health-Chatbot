@@ -10,9 +10,9 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateUser({ name, email });
+    await updateUser({ name, email });
     setIsEditing(false);
     setSuccessMessage('Profile updated successfully!');
     setTimeout(() => setSuccessMessage(''), 3000);

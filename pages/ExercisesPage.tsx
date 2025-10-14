@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { MINDFULNESS_EXERCISES } from '../constants';
+import { useEffect, useState } from 'react';
+import { getExercises } from '../api/misc';
 import type { MindfulnessExercise } from '../types';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
@@ -35,12 +36,24 @@ const ExerciseModal: React.FC<{
 
 const ExercisesPage: React.FC = () => {
   const [selectedExercise, setSelectedExercise] = useState<MindfulnessExercise | null>(null);
+  const [items, setItems] = useState<MindfulnessExercise[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getExercises();
+        setItems(res.exercises);
+      } catch {
+        setItems([]);
+      }
+    })();
+  }, []);
 
   return (
     <div className="p-4 bg-white dark:bg-neutral rounded-lg shadow-md h-full">
       <h1 className="text-2xl font-bold mb-6">Mindfulness Exercises</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MINDFULNESS_EXERCISES.map(exercise => (
+        {items.map(exercise => (
           <div
             key={exercise.id}
             onClick={() => setSelectedExercise(exercise)}
