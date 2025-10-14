@@ -1,31 +1,20 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PaperAirplaneIcon, UserCircleIcon, SparklesIcon } from '@heroicons/react/24/solid';
-import { createChatSession } from '../services/geminiService';
-import type { Chat } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
-import { useJournal } from '../contexts/JournalContext';
-import { useTest } from '../contexts/TestContext';
+import { apiService } from '../services/api';
+import type { ChatMessage, ChatSession } from '../types';
 import Markdown from 'react-markdown';
 
-
-interface Message {
-  sender: 'user' | 'bot';
-  text: string;
-}
-
 const ChatbotPage: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatRef = useRef<Chat | null>(null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, isGuest } = useAuth();
-  const { entries: journalEntries } = useJournal();
-  const { getLatestResult } = useTest();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     initializeChat();
   }, [user]);
 
@@ -37,56 +26,56 @@ const ChatbotPage: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const initializeChat = useCallback(() => {
+  const initializeChat = () => {
     if (user) {
-        const latestJournalEntry = journalEntries.length > 0 ? journalEntries[0] : undefined;
-        const latestTestResult = getLatestResult();
-        
-        chatRef.current = createChatSession({
-            userName: user.name,
-            isGuest,
-            latestJournalEntry,
-            latestTestResult,
-        });
-
-        setMessages([
-            { sender: 'bot', text: `Hello ${user.name}! I'm Serene, your personal AI companion for mental wellness. How are you feeling today?` }
-        ]);
+      const welcomeMessage: ChatMessage = {
+        id: 0,
+        message: `Hello ${user.username}! I'm your AI mental health companion. I'm here to listen, support, and help you on your wellness journey. How are you feeling today?`,
+        is_user: false,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages([welcomeMessage]);
     }
-  }, [user, isGuest, journalEntries, getLatestResult]);
-
+  };
 
   const handleSend = async () => {
     if (input.trim() === '' || isLoading) return;
 
-    const userMessage: Message = { sender: 'user', text: input };
+    const userMessage: ChatMessage = {
+      id: Date.now(),
+      message: input,
+      is_user: true,
+      timestamp: new Date().toISOString(),
+    };
+    
     setMessages(prev => [...prev, userMessage]);
+    const messageText = input;
     setInput('');
     setIsLoading(true);
 
-    // Add a placeholder for the bot's response
-    setMessages(prev => [...prev, { sender: 'bot', text: '' }]);
-
     try {
-      if (chatRef.current) {
-        const stream = await chatRef.current.sendMessageStream({ message: input });
-        let botResponseText = '';
-        for await (const chunk of stream) {
-            botResponseText += chunk.text;
-            setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1] = { sender: 'bot', text: botResponseText };
-                return newMessages;
-            });
-        }
-      }
-    } catch (error) {
-      console.error('Error sending message to Gemini:', error);
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = { sender: 'bot', text: 'Sorry, I encountered an error. Please try again.' };
-        return newMessages;
+      const response = await apiService.sendMessage({
+        message: messageText,
+        session_id: currentSessionId || undefined,
       });
+
+      // If this is the first message, extract session ID from response
+      if (!currentSessionId && response.id) {
+        // We'll need to get the session ID from the backend response
+        // For now, we'll generate one locally
+        setCurrentSessionId(`session_${Date.now()}`);
+      }
+
+      setMessages(prev => [...prev, response]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorMessage: ChatMessage = {
+        id: Date.now() + 1,
+        message: 'Sorry, I encountered an error. Please try again. If you\'re not logged in, some features may be limited.',
+        is_user: false,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -99,19 +88,31 @@ const ChatbotPage: React.FC = () => {
       </header>
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
         {messages.map((msg, index) => (
-          <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
-            {msg.sender === 'bot' && <SparklesIcon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />}
+          <div key={msg.id || index} className={`flex items-start gap-3 ${msg.is_user ? 'justify-end' : ''}`}>
+            {!msg.is_user && <SparklesIcon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />}
             <div className={`max-w-xl p-3 rounded-2xl ${
-                msg.sender === 'user'
+                msg.is_user
                   ? 'bg-primary text-white rounded-br-none'
                   : 'bg-gray-100 dark:bg-dark text-neutral dark:text-light rounded-bl-none'
               }`}
             >
-              {msg.text ? <Markdown>{msg.text}</Markdown> : <div className="animate-pulse flex space-x-2"><div className="rounded-full bg-gray-300 h-2 w-2"></div><div className="rounded-full bg-gray-300 h-2 w-2"></div><div className="rounded-full bg-gray-300 h-2 w-2"></div></div>}
+              <Markdown>{msg.message}</Markdown>
             </div>
-             {msg.sender === 'user' && <UserCircleIcon className="h-8 w-8 text-secondary flex-shrink-0 mt-1" />}
+            {msg.is_user && <UserCircleIcon className="h-8 w-8 text-secondary flex-shrink-0 mt-1" />}
           </div>
         ))}
+        {isLoading && (
+          <div className="flex items-start gap-3">
+            <SparklesIcon className="h-8 w-8 text-primary flex-shrink-0 mt-1" />
+            <div className="max-w-xl p-3 rounded-2xl bg-gray-100 dark:bg-dark text-neutral dark:text-light rounded-bl-none">
+              <div className="animate-pulse flex space-x-2">
+                <div className="rounded-full bg-gray-300 h-2 w-2"></div>
+                <div className="rounded-full bg-gray-300 h-2 w-2"></div>
+                <div className="rounded-full bg-gray-300 h-2 w-2"></div>
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
