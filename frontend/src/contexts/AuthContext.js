@@ -70,8 +70,17 @@ export const AuthProvider = ({ children }) => {
         password 
       });
       
-      return { success: true, user: response.data };
+      // After successful registration, automatically log the user in
+      const loginResponse = await axios.post('/auth/login', { email, password });
+      const { access_token, user: userData } = loginResponse.data;
+      
+      localStorage.setItem('token', access_token);
+      setToken(access_token);
+      setUser(userData);
+      
+      return { success: true, user: userData };
     } catch (error) {
+      console.error('Registration error:', error);
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Registration failed' 

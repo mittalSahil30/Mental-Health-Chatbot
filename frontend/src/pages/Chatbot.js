@@ -31,7 +31,7 @@ const Chatbot = () => {
         }
       ]);
     }
-  }, [user, messages.length]);
+  }, [user]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -51,7 +51,8 @@ const Chatbot = () => {
 
     try {
       const response = await axios.post('/chat', {
-        message: inputMessage
+        message: inputMessage,
+        user_id: user?.id
       });
 
       const botMessage = {
@@ -64,16 +65,27 @@ const Chatbot = () => {
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      let errorMessage = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
+      
+      if (error.response?.status === 500) {
+        errorMessage = "The server is experiencing issues. Please try again later.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "User not found. Please refresh the page and try again.";
+      } else if (error.code === 'NETWORK_ERROR') {
+        errorMessage = "Network error. Please check your connection and try again.";
+      }
+      
       toast.error('Failed to send message. Please try again.');
       
-      const errorMessage = {
+      const errorResponse = {
         id: Date.now() + 1,
-        message: "I'm sorry, I'm having trouble responding right now. Please try again in a moment.",
+        message: errorMessage,
         is_user: false,
         created_at: new Date().toISOString()
       };
 
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, errorResponse]);
     } finally {
       setLoading(false);
     }

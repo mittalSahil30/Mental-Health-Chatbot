@@ -78,6 +78,7 @@ class SOSContactResponse(BaseModel):
 # Chat Message schemas
 class ChatMessageCreate(BaseModel):
     message: str
+    user_id: Optional[int] = None
 
 class ChatMessageResponse(BaseModel):
     id: int

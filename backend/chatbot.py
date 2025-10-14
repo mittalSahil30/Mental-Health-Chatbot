@@ -34,13 +34,15 @@ def get_chatbot_response(
     # Create personalized prompt
     prompt = create_personalized_prompt(user_message, context, conversation_history)
     
-    if model and GEMINI_API_KEY:
+    if model and GEMINI_API_KEY and GEMINI_API_KEY != "your-gemini-api-key-here":
         try:
             response = model.generate_content(prompt)
             return response.text
         except Exception as e:
+            print(f"Gemini API error: {e}")
             return get_fallback_response(user_message, context)
     else:
+        print("Using fallback response - Gemini API not configured")
         return get_fallback_response(user_message, context)
 
 def build_user_context(user: User, journal_entries: List[Journal], mental_health_tests: List[MentalHealthTest]) -> str:

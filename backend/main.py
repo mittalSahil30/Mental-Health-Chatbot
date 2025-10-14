@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import uvicorn
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 from database import get_db, engine, Base
 from models import User, Journal, MentalHealthTest, MindfulnessExercise, SOSContact, ChatMessage
@@ -279,58 +280,89 @@ async def get_sos_contacts(
 @app.post("/chat", response_model=ChatMessageResponse)
 async def chat_with_bot(
     message: ChatMessageCreate,
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Get user's previous messages for context
-    previous_messages = db.query(ChatMessage).filter(
-        ChatMessage.user_id == current_user.id
-    ).order_by(ChatMessage.created_at.desc()).limit(10).all()
+    # Handle both authenticated and guest users
+    if message.user_id:
+        current_user = db.query(User).filter(User.id == message.user_id).first()
+        if not current_user:
+            raise HTTPException(status_code=404, detail="User not found")
+    else:
+        # Create a temporary user object for guests
+        current_user = type('User', (), {
+            'id': None,
+            'username': 'Guest',
+            'is_guest': True
+        })()
     
-    # Get user's journal entries for personalization
-    journal_entries = db.query(Journal).filter(
-        Journal.user_id == current_user.id
-    ).order_by(Journal.created_at.desc()).limit(5).all()
+    # Get user's previous messages for context (only for registered users)
+    previous_messages = []
+    journal_entries = []
+    mental_health_tests = []
     
-    # Get user's mental health test results
-    mental_health_tests = db.query(MentalHealthTest).filter(
-        MentalHealthTest.user_id == current_user.id
-    ).order_by(MentalHealthTest.created_at.desc()).limit(3).all()
+    if current_user.id:
+        previous_messages = db.query(ChatMessage).filter(
+            ChatMessage.user_id == current_user.id
+        ).order_by(ChatMessage.created_at.desc()).limit(10).all()
+        
+        # Get user's journal entries for personalization
+        journal_entries = db.query(Journal).filter(
+            Journal.user_id == current_user.id
+        ).order_by(Journal.created_at.desc()).limit(5).all()
+        
+        # Get user's mental health test results
+        mental_health_tests = db.query(MentalHealthTest).filter(
+            MentalHealthTest.user_id == current_user.id
+        ).order_by(MentalHealthTest.created_at.desc()).limit(3).all()
     
     # Generate personalized response
-    response = get_chatbot_response(
-        message.message,
-        current_user,
-        previous_messages,
-        journal_entries,
-        mental_health_tests
-    )
+    try:
+        response = get_chatbot_response(
+            message.message,
+            current_user,
+            previous_messages,
+            journal_entries,
+            mental_health_tests
+        )
+    except Exception as e:
+        print(f"Error generating chatbot response: {e}")
+        response = "I'm sorry, I'm having trouble processing your message right now. Please try again in a moment."
     
-    # Save user message
-    db_user_message = ChatMessage(
-        message=message.message,
-        is_user=True,
-        user_id=current_user.id
-    )
-    db.add(db_user_message)
-    
-    # Save bot response
-    db_bot_message = ChatMessage(
-        message=response,
-        is_user=False,
-        user_id=current_user.id
-    )
-    db.add(db_bot_message)
-    
-    db.commit()
-    db.refresh(db_bot_message)
-    
-    return ChatMessageResponse(
-        id=db_bot_message.id,
-        message=db_bot_message.message,
-        is_user=db_bot_message.is_user,
-        created_at=db_bot_message.created_at
-    )
+    # Save messages only for registered users
+    if current_user.id:
+        # Save user message
+        db_user_message = ChatMessage(
+            message=message.message,
+            is_user=True,
+            user_id=current_user.id
+        )
+        db.add(db_user_message)
+        
+        # Save bot response
+        db_bot_message = ChatMessage(
+            message=response,
+            is_user=False,
+            user_id=current_user.id
+        )
+        db.add(db_bot_message)
+        
+        db.commit()
+        db.refresh(db_bot_message)
+        
+        return ChatMessageResponse(
+            id=db_bot_message.id,
+            message=db_bot_message.message,
+            is_user=db_bot_message.is_user,
+            created_at=db_bot_message.created_at
+        )
+    else:
+        # For guest users, return response without saving to database
+        return ChatMessageResponse(
+            id=0,
+            message=response,
+            is_user=False,
+            created_at=datetime.utcnow()
+        )
 
 @app.get("/chat/history", response_model=list[ChatMessageResponse])
 async def get_chat_history(
