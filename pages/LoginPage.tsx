@@ -6,22 +6,37 @@ import { SparklesIcon } from '@heroicons/react/24/solid';
 
 const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, enterAsGuest } = useAuth();
+  const { login, register, enterAsGuest } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This is a mock authentication. In a real app, you'd call an API.
-    const user = {
-      id: email || `user_${Date.now()}`,
-      name: name,
-      email: email
-    };
-    login(user);
-    navigate('/');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        await login({ username, password });
+      } else {
+        await register({ 
+          username, 
+          email, 
+          password, 
+          full_name: fullName 
+        });
+      }
+      navigate('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -37,24 +52,41 @@ const LoginPage: React.FC = () => {
             </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {!isLogin && (
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-light dark:bg-dark text-neutral dark:text-light focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Your Name"
-            />
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+              {error}
+            </div>
           )}
+          
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-light dark:bg-dark text-neutral dark:text-light focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Email address"
+            placeholder="Username"
           />
+          
+          {!isLogin && (
+            <>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-light dark:bg-dark text-neutral dark:text-light focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Full Name (optional)"
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-light dark:bg-dark text-neutral dark:text-light focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Email address"
+              />
+            </>
+          )}
+          
           <input
             type="password"
             value={password}
@@ -63,11 +95,13 @@ const LoginPage: React.FC = () => {
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-light dark:bg-dark text-neutral dark:text-light focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Password"
           />
+          
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            disabled={isLoading}
+            className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLogin ? 'Sign In' : 'Sign Up'}
+            {isLoading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
           </button>
         </form>
         <div className="text-center">
