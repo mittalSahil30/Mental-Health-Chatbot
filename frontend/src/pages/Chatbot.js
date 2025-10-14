@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Send, Bot, User, Loader } from 'lucide-react';
+import { Send, Bot, User, Loader, Heart, Shield } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
