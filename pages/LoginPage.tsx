@@ -10,17 +10,15 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { login, enterAsGuest } = useAuth();
+  const { signup, passwordLogin, enterAsGuest, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This is a mock authentication. In a real app, you'd call an API.
-    const user = {
-      id: email || `user_${Date.now()}`,
-      name: name,
-      email: email
-    };
-    login(user);
+    if (isLogin) {
+      await passwordLogin(email, password);
+    } else {
+      await signup(name, email, password);
+    }
     navigate('/');
   };
 
@@ -65,7 +63,8 @@ const LoginPage: React.FC = () => {
           />
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            disabled={loading}
+            className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60"
           >
             {isLogin ? 'Sign In' : 'Sign Up'}
           </button>
@@ -81,7 +80,7 @@ const LoginPage: React.FC = () => {
             <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
         </div>
         <button
-          onClick={() => { enterAsGuest(); navigate('/'); }}
+          onClick={async () => { await enterAsGuest(); navigate('/'); }}
           className="w-full py-3 px-4 bg-secondary text-white font-semibold rounded-lg hover:bg-secondary/90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
         >
           Continue as Guest

@@ -1,25 +1,45 @@
 
-import React, { createContext, useContext, ReactNode, useCallback } from 'react';
-import useLocalStorage from '../hooks/useLocalStorage';
+import React, { createContext, useContext, ReactNode, useCallback, useEffect, useState } from 'react';
 import type { TestResult } from '../types';
 import { useAuth } from './AuthContext';
+import * as testApi from '../api/test';
 
 interface TestContextType {
   results: TestResult[];
-  addResult: (result: TestResult) => void;
+  addResult: (result: TestResult) => Promise<void>;
   getLatestResult: () => TestResult | undefined;
 }
 
 const TestContext = createContext<TestContextType | undefined>(undefined);
 
 export const TestProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const storageKey = user && user.id !== 'guest' ? `testResults_${user.id}` : 'testResults_guest';
-  const [results, setResults] = useLocalStorage<TestResult[]>(storageKey, []);
+  const { user, isAuthenticated } = useAuth();
+  const [results, setResults] = useState<TestResult[]>([]);
 
-  const addResult = useCallback((result: TestResult) => {
-    setResults(prev => [result, ...prev]);
-  }, [setResults]);
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setResults([]);
+      return;
+    }
+    (async () => {
+      try {
+        const apiResults = await testApi.listResults();
+        const normalized: TestResult[] = apiResults.map(r => ({
+          score: r.score,
+          interpretation: r.interpretation,
+          date: r.date,
+        }));
+        setResults(normalized);
+      } catch {
+        setResults([]);
+      }
+    })();
+  }, [isAuthenticated, user?.id]);
+
+  const addResult = useCallback(async (result: TestResult) => {
+    const created = await testApi.createResult(result.score, result.interpretation, result.date);
+    setResults(prev => [{ score: created.score, interpretation: created.interpretation, date: created.date }, ...prev]);
+  }, []);
 
   const getLatestResult = useCallback(() => {
     return results?.[0];
