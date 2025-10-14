@@ -36,32 +36,50 @@ app.add_middleware(
 
 security = HTTPBearer()
 
+# Health check endpoint
+@app.get("/")
+async def root():
+    return {"message": "Mental Health Chatbot API is running!"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "message": "API is working properly"}
+
 # Authentication endpoints
 @app.post("/auth/register", response_model=UserResponse)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if user already exists
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Create new user
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        username=user.username,
-        hashed_password=hashed_password,
-        is_guest=False
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return UserResponse(
-        id=db_user.id,
-        email=db_user.email,
-        username=db_user.username,
-        is_guest=db_user.is_guest
-    )
+    try:
+        print(f"Registration attempt for email: {user.email}")
+        
+        # Check if user already exists
+        db_user = db.query(User).filter(User.email == user.email).first()
+        if db_user:
+            print(f"User already exists: {user.email}")
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create new user
+        hashed_password = get_password_hash(user.password)
+        db_user = User(
+            email=user.email,
+            username=user.username,
+            hashed_password=hashed_password,
+            is_guest=False
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        
+        print(f"User created successfully: {db_user.id}")
+        
+        return UserResponse(
+            id=db_user.id,
+            email=db_user.email,
+            username=db_user.username,
+            is_guest=db_user.is_guest
+        )
+    except Exception as e:
+        print(f"Registration error: {e}")
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @app.post("/auth/login", response_model=dict)
 async def login(user: UserLogin, db: Session = Depends(get_db)):
