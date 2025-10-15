@@ -270,7 +270,6 @@ const Journal = () => {
           )}
         </div>
       </div>
-      </div>
     </div>
   );
 };
