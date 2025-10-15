@@ -347,24 +347,36 @@ const MentalHealthTest = () => {
               {questions[currentQuestion]?.question}
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {scaleOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => handleAnswer(option.value)}
-                  className={`w-full p-4 text-left border-2 rounded-lg transition-all ${
+                  className={`w-full p-6 text-left border-2 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
                     answers[questions[currentQuestion]?.id] === option.value
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium">{option.label}</div>
-                      <div className="text-sm text-gray-600">{option.description}</div>
+                    <div className="flex items-center gap-4">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                        answers[questions[currentQuestion]?.id] === option.value
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {option.value}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-lg">{option.label}</div>
+                        <div className="text-gray-600">{option.description}</div>
+                      </div>
                     </div>
                     {answers[questions[currentQuestion]?.id] === option.value && (
-                      <CheckCircle className="text-blue-500" size={20} />
+                      <div className="flex items-center gap-2 text-blue-500">
+                        <CheckCircle size={24} />
+                        <span className="font-medium">Selected</span>
+                      </div>
                     )}
                   </div>
                 </button>
@@ -390,31 +402,6 @@ const MentalHealthTest = () => {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <Brain className="mx-auto mb-4 text-blue-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Comprehensive</h3>
-            <p className="text-gray-600 text-sm">
-              Covers depression, anxiety, and general well-being
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <BarChart3 className="mx-auto mb-4 text-green-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Personalized</h3>
-            <p className="text-gray-600 text-sm">
-              Results tailored to your specific situation
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <AlertCircle className="mx-auto mb-4 text-purple-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Professional</h3>
-            <p className="text-gray-600 text-sm">
-              Based on established mental health assessment tools
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

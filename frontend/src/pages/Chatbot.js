@@ -170,39 +170,6 @@ const Chatbot = () => {
         </form>
       </div>
 
-      <div className="mt-12 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="card text-center scale-in" style={{ animationDelay: '0.2s' }}>
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Bot className="text-white" size={32} />
-            </div>
-            <h3 className="text-xl font-bold mb-3 gradient-text">24/7 Support</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Available anytime you need someone to talk to, providing immediate support whenever you need it most.
-            </p>
-          </div>
-
-          <div className="card text-center scale-in" style={{ animationDelay: '0.3s' }}>
-            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Heart className="text-white" size={32} />
-            </div>
-            <h3 className="text-xl font-bold mb-3 gradient-text">Personalized</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Responses tailored to your unique situation, learning from your interactions to provide better support.
-            </p>
-          </div>
-
-          <div className="card text-center scale-in" style={{ animationDelay: '0.4s' }}>
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Shield className="text-white" size={32} />
-            </div>
-            <h3 className="text-xl font-bold mb-3 gradient-text">Safe Space</h3>
-            <p className="text-gray-600 leading-relaxed">
-              Confidential and judgment-free conversations in a secure, supportive environment designed for your well-being.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

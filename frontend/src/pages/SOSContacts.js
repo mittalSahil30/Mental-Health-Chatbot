@@ -312,31 +312,6 @@ const SOSContacts = () => {
           )}
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <AlertTriangle className="mx-auto mb-4 text-red-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Emergency</h3>
-            <p className="text-gray-600 text-sm">
-              For immediate danger or crisis situations, call 911 or your local emergency number
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <Heart className="mx-auto mb-4 text-pink-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Crisis Support</h3>
-            <p className="text-gray-600 text-sm">
-              National Suicide Prevention Lifeline: 988 (US) or your local crisis hotline
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <User className="mx-auto mb-4 text-blue-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Professional Help</h3>
-            <p className="text-gray-600 text-sm">
-              Reach out to mental health professionals for ongoing support and treatment
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

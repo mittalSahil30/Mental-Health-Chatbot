@@ -114,14 +114,14 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
-            <div className="navbar-actions">
+            <>
               <Link to="/login" className="btn btn-secondary">
                 Login
               </Link>
               <Link to="/register" className="btn btn-primary">
                 Register
               </Link>
-            </div>
+            </>
           )}
         </div>
       </div>

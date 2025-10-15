@@ -191,28 +191,30 @@ const Register = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary w-full"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <div className="spinner mr-2"></div>
-              Creating Account...
-            </>
-          ) : (
-            'Create Account'
-          )}
-        </button>
+        <div className="flex flex-col gap-4">
+          <button
+            type="submit"
+            className="btn btn-primary w-full"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <div className="spinner mr-2"></div>
+                Creating Account...
+              </>
+            ) : (
+              'Create Account'
+            )}
+          </button>
+          
+          <div className="text-center">
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium underline">
+              Sign in here
+            </Link>
+          </div>
+        </div>
       </form>
-
-      <div className="form-footer">
-        Already have an account?{' '}
-        <Link to="/login" className="text-blue-600 hover:text-blue-800">
-          Sign in here
-        </Link>
-      </div>
     </div>
   );
 };

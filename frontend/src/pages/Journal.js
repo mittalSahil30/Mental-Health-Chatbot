@@ -120,23 +120,24 @@ const Journal = () => {
 
   return (
     <div className="journal-page fade-in">
-      <div className="text-center mb-12">
-        <div className="floating">
-          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-            <span className="gradient-text">Personal Journal</span>
-          </h1>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="floating">
+            <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+              <span className="gradient-text">Personal Journal</span>
+            </h1>
+          </div>
+          <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+            Record your thoughts, feelings, and daily experiences in your private space for reflection and growth.
+          </p>
         </div>
-        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-          Record your thoughts, feelings, and daily experiences in your private space for reflection and growth.
-        </p>
-      </div>
 
       <div className="max-w-4xl mx-auto">
         {!showForm ? (
           <div className="text-center mb-8">
             <button
               onClick={() => setShowForm(true)}
-              className="btn btn-primary"
+              className="btn btn-primary text-lg px-8 py-4"
             >
               <Plus className="mr-2" size={20} />
               New Entry
@@ -144,9 +145,11 @@ const Journal = () => {
           </div>
         ) : (
           <div className="card mb-8">
-            <h2 className="text-xl font-semibold mb-6">
-              {editingEntry ? 'Edit Entry' : 'New Journal Entry'}
-            </h2>
+            <div className="card-header">
+              <h2 className="card-title">
+                {editingEntry ? 'Edit Entry' : 'New Journal Entry'}
+              </h2>
+            </div>
             
             <form onSubmit={handleSubmit}>
               <div className="form-group">

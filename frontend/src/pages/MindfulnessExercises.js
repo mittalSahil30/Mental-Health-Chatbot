@@ -237,61 +237,6 @@ const MindfulnessExercises = () => {
           ))}
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <Heart className="mx-auto mb-4 text-pink-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Reduce Stress</h3>
-            <p className="text-gray-600 text-sm">
-              Regular mindfulness practice can significantly reduce stress and anxiety
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <Brain className="mx-auto mb-4 text-blue-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Improve Focus</h3>
-            <p className="text-gray-600 text-sm">
-              Enhance your concentration and mental clarity through mindful awareness
-            </p>
-          </div>
-
-          <div className="card text-center">
-            <Sun className="mx-auto mb-4 text-yellow-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Better Sleep</h3>
-            <p className="text-gray-600 text-sm">
-              Mindfulness exercises can help improve sleep quality and relaxation
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-8 card">
-          <h3 className="text-xl font-semibold mb-4">Tips for Effective Practice</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold mb-2">Find a Quiet Space</h4>
-              <p className="text-gray-600 text-sm">
-                Choose a comfortable, quiet place where you won't be disturbed during your practice.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Start Small</h4>
-              <p className="text-gray-600 text-sm">
-                Begin with shorter exercises and gradually increase the duration as you build your practice.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Be Consistent</h4>
-              <p className="text-gray-600 text-sm">
-                Regular practice, even for just a few minutes daily, is more effective than occasional long sessions.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Be Patient</h4>
-              <p className="text-gray-600 text-sm">
-                It's normal for your mind to wander. Gently bring your attention back to the exercise without judgment.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

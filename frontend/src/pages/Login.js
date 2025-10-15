@@ -106,54 +106,39 @@ const Login = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary w-full"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <div className="spinner mr-2"></div>
-              Signing In...
-            </>
-          ) : (
-            'Sign In'
-          )}
-        </button>
-      </form>
-
-      <div className="text-center my-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <button
+              type="submit"
+              className="btn btn-primary flex-1"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="spinner mr-2"></div>
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+            <Link to="/register" className="btn btn-secondary flex-1">
+              Sign Up
+            </Link>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue as</span>
+          
+          <div className="text-center">
+            <span className="text-gray-600">or </span>
+            <button
+              onClick={handleGuestLogin}
+              className="text-blue-600 hover:text-blue-800 font-medium underline"
+              disabled={loading}
+            >
+              Continue as Guest
+            </button>
           </div>
         </div>
-      </div>
-
-      <button
-        onClick={handleGuestLogin}
-        className="btn btn-secondary w-full"
-        disabled={loading}
-      >
-        {loading ? (
-          <>
-            <div className="spinner mr-2"></div>
-            Creating Guest Account...
-          </>
-        ) : (
-          'Continue as Guest'
-        )}
-      </button>
-
-      <div className="form-footer">
-        Don't have an account?{' '}
-        <Link to="/register" className="text-blue-600 hover:text-blue-800">
-          Sign up here
-        </Link>
-      </div>
+      </form>
     </div>
   );
 };
