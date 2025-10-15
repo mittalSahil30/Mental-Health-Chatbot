@@ -28,7 +28,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-content">
         <Link to="/" className="navbar-brand">
-          <Heart className="inline-block mr-2" size={24} />
+          <Heart className="inline-block" size={24} />
           Mental Health Chatbot
         </Link>
 
@@ -39,7 +39,7 @@ const Navbar = () => {
                 to="/dashboard" 
                 className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
               >
-                <Home size={16} className="inline-block mr-1" />
+                <Home size={16} />
                 Dashboard
               </Link>
             </li>
@@ -48,7 +48,7 @@ const Navbar = () => {
                 to="/chatbot" 
                 className={`nav-link ${isActive('/chatbot') ? 'active' : ''}`}
               >
-                <MessageCircle size={16} className="inline-block mr-1" />
+                <MessageCircle size={16} />
                 Chatbot
               </Link>
             </li>
@@ -59,7 +59,7 @@ const Navbar = () => {
                     to="/journal" 
                     className={`nav-link ${isActive('/journal') ? 'active' : ''}`}
                   >
-                    <BookOpen size={16} className="inline-block mr-1" />
+                    <BookOpen size={16} />
                     Journal
                   </Link>
                 </li>
@@ -68,7 +68,7 @@ const Navbar = () => {
                     to="/mental-health-test" 
                     className={`nav-link ${isActive('/mental-health-test') ? 'active' : ''}`}
                   >
-                    <Brain size={16} className="inline-block mr-1" />
+                    <Brain size={16} />
                     Health Test
                   </Link>
                 </li>
@@ -77,7 +77,7 @@ const Navbar = () => {
                     to="/mindfulness" 
                     className={`nav-link ${isActive('/mindfulness') ? 'active' : ''}`}
                   >
-                    <Heart size={16} className="inline-block mr-1" />
+                    <Heart size={16} />
                     Mindfulness
                   </Link>
                 </li>
@@ -86,7 +86,7 @@ const Navbar = () => {
                     to="/sos-contacts" 
                     className={`nav-link ${isActive('/sos-contacts') ? 'active' : ''}`}
                   >
-                    <Phone size={16} className="inline-block mr-1" />
+                    <Phone size={16} />
                     SOS Contacts
                   </Link>
                 </li>
@@ -104,12 +104,12 @@ const Navbar = () => {
               <span>{user.username}</span>
               {!user.is_guest && (
                 <Link to="/profile" className="nav-link">
-                  <User size={16} className="inline-block mr-1" />
+                  <User size={16} />
                   Profile
                 </Link>
               )}
               <button onClick={handleLogout} className="btn btn-secondary">
-                <LogOut size={16} className="inline-block mr-1" />
+                <LogOut size={16} />
                 Logout
               </button>
             </div>

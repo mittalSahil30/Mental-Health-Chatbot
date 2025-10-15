@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Heart, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Eye, EyeOff, Heart, CheckCircle } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -52,7 +51,7 @@ const Register = () => {
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     } else if (formData.password.length > 72) {
-      newErrors.password = 'Password must be less than 72 characters';
+      newErrors.password = 'Password cannot be longer than 72 characters';
     }
 
     if (!formData.confirmPassword) {
@@ -74,147 +73,149 @@ const Register = () => {
 
     setLoading(true);
 
-    const result = await register(formData.email, formData.username, formData.password);
-    
-    if (result.success) {
-      toast.success('Registration successful! Please log in.');
-      navigate('/login');
-    } else {
-      toast.error(result.error);
+    try {
+      await register(formData.email, formData.username, formData.password);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Registration error:', error);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
-    <div className="form-container scale-in">
-      <div className="text-center mb-10">
-        <div className="floating">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Heart className="text-white" size={40} />
+    <div className="main-content">
+      <div className="form-container">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-r from-accent-primary to-accent-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+            <Heart className="text-white" size={32} />
           </div>
+          <h1 className="text-3xl font-bold mb-2">Create Account</h1>
+          <p className="text-secondary">Join us on your mental health journey</p>
         </div>
-        <h1 className="form-title">Create Account</h1>
-        <p className="form-subtitle">Join us on your mental health journey and unlock personalized features</p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`form-input ${errors.email ? 'border-accent-danger' : ''}`}
+              placeholder="Enter your email"
+              required
+            />
+            {errors.email && <div className="text-accent-danger text-sm mt-1">{errors.email}</div>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="username" className="form-label">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className={`form-input ${errors.username ? 'border-accent-danger' : ''}`}
+              placeholder="Choose a username"
+              required
+            />
+            {errors.username && <div className="text-accent-danger text-sm mt-1">{errors.username}</div>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`form-input pr-12 ${errors.password ? 'border-accent-danger' : ''}`}
+                placeholder="Create a password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted hover:text-primary"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors.password && <div className="text-accent-danger text-sm mt-1">{errors.password}</div>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirmPassword" className="form-label">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className={`form-input pr-12 ${errors.confirmPassword ? 'border-accent-danger' : ''}`}
+                placeholder="Confirm your password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted hover:text-primary"
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors.confirmPassword && <div className="text-accent-danger text-sm mt-1">{errors.confirmPassword}</div>}
+          </div>
+
+          <div className="mb-6">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="text-accent-success mt-1 flex-shrink-0" size={16} />
+              <p className="text-sm text-secondary">
+                By creating an account, you agree to our terms of service and privacy policy. 
+                Your data is secure and will only be used to provide personalized mental health support.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="spinner mr-2"></div>
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </button>
+            
+            <div className="text-center">
+              Already have an account?{' '}
+              <Link to="/login" className="text-accent-primary hover:text-accent-secondary font-medium underline">
+                Sign in here
+              </Link>
+            </div>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`form-input ${errors.email ? 'border-red-500' : ''}`}
-            placeholder="Enter your email"
-          />
-          {errors.email && <div className="form-error">{errors.email}</div>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="username" className="form-label">
-            Username
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className={`form-input ${errors.username ? 'border-red-500' : ''}`}
-            placeholder="Choose a username"
-          />
-          {errors.username && <div className="form-error">{errors.username}</div>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`form-input pr-12 ${errors.password ? 'border-red-500' : ''}`}
-              placeholder="Create a password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-          {errors.password && <div className="form-error">{errors.password}</div>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="confirmPassword" className="form-label">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <input
-              type={showConfirmPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className={`form-input pr-12 ${errors.confirmPassword ? 'border-red-500' : ''}`}
-              placeholder="Confirm your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-          {errors.confirmPassword && <div className="form-error">{errors.confirmPassword}</div>}
-        </div>
-
-        <div className="mb-6">
-          <div className="flex items-start">
-            <CheckCircle className="text-green-500 mr-2 mt-1" size={16} />
-            <p className="text-sm text-gray-600">
-              By creating an account, you agree to our terms of service and privacy policy. 
-              Your data is secure and will only be used to provide personalized mental health support.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <button
-            type="submit"
-            className="btn btn-primary w-full"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <div className="spinner mr-2"></div>
-                Creating Account...
-              </>
-            ) : (
-              'Create Account'
-            )}
-          </button>
-          
-          <div className="text-center">
-            Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium underline">
-              Sign in here
-            </Link>
-          </div>
-        </div>
-      </form>
     </div>
   );
 };

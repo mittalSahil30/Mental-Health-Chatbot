@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Phone, Mail, User, AlertTriangle, Heart } from 'lucide-react';
+import { Plus, Edit, Trash2, Phone, Mail, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -11,18 +11,10 @@ const SOSContacts = () => {
     name: '',
     phone: '',
     email: '',
-    type: 'emergency'
+    relationship: '',
+    notes: ''
   });
   const [loading, setLoading] = useState(true);
-
-  const contactTypes = [
-    { value: 'emergency', label: 'Emergency Services', icon: '🚨', color: 'text-red-500' },
-    { value: 'therapist', label: 'Therapist/Counselor', icon: '👨‍⚕️', color: 'text-blue-500' },
-    { value: 'family', label: 'Family Member', icon: '👨‍👩‍👧‍👦', color: 'text-green-500' },
-    { value: 'friend', label: 'Close Friend', icon: '👫', color: 'text-purple-500' },
-    { value: 'crisis', label: 'Crisis Hotline', icon: '📞', color: 'text-orange-500' },
-    { value: 'other', label: 'Other', icon: '👤', color: 'text-gray-500' }
-  ];
 
   useEffect(() => {
     fetchContacts();
@@ -43,8 +35,8 @@ const SOSContacts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name.trim() || (!formData.phone.trim() && !formData.email.trim())) {
-      toast.error('Please provide at least a name and either phone or email');
+    if (!formData.name.trim()) {
+      toast.error('Please enter a name');
       return;
     }
 
@@ -59,7 +51,7 @@ const SOSContacts = () => {
       
       setShowForm(false);
       setEditingContact(null);
-      setFormData({ name: '', phone: '', email: '', type: 'emergency' });
+      setFormData({ name: '', phone: '', email: '', relationship: '', notes: '' });
       fetchContacts();
     } catch (error) {
       console.error('Error saving contact:', error);
@@ -71,9 +63,10 @@ const SOSContacts = () => {
     setEditingContact(contact);
     setFormData({
       name: contact.name,
-      phone: contact.phone,
-      email: contact.email,
-      type: contact.type
+      phone: contact.phone || '',
+      email: contact.email || '',
+      relationship: contact.relationship || '',
+      notes: contact.notes || ''
     });
     setShowForm(true);
   };
@@ -96,22 +89,7 @@ const SOSContacts = () => {
   const handleCancel = () => {
     setShowForm(false);
     setEditingContact(null);
-    setFormData({ name: '', phone: '', email: '', type: 'emergency' });
-  };
-
-  const getContactIcon = (type) => {
-    const contactType = contactTypes.find(t => t.value === type);
-    return contactType ? contactType.icon : '👤';
-  };
-
-  const getContactColor = (type) => {
-    const contactType = contactTypes.find(t => t.value === type);
-    return contactType ? contactType.color : 'text-gray-500';
-  };
-
-  const getContactLabel = (type) => {
-    const contactType = contactTypes.find(t => t.value === type);
-    return contactType ? contactType.label : 'Other';
+    setFormData({ name: '', phone: '', email: '', relationship: '', notes: '' });
   };
 
   const handleCall = (phone) => {
@@ -124,22 +102,18 @@ const SOSContacts = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
+      <div className="loading-container">
         <div className="spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="sos-contacts-page fade-in">
-      <div className="text-center mb-12">
-        <div className="floating">
-          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-            <span className="gradient-text">SOS Contacts</span>
-          </h1>
-        </div>
-        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-          Emergency contacts and crisis support resources to ensure you have immediate access to help when you need it most.
+    <div className="main-content fade-in">
+      <div className="page-header">
+        <h1 className="page-title">SOS Contacts</h1>
+        <p className="page-subtitle">
+          Manage your emergency contacts and support resources for quick access when you need help.
         </p>
       </div>
 
@@ -150,47 +124,43 @@ const SOSContacts = () => {
               onClick={() => setShowForm(true)}
               className="btn btn-primary"
             >
-              <Plus className="mr-2" size={20} />
+              <Plus size={20} />
               Add Contact
             </button>
           </div>
         ) : (
           <div className="card mb-8">
-            <h2 className="text-xl font-semibold mb-6">
-              {editingContact ? 'Edit Contact' : 'Add New Contact'}
-            </h2>
+            <div className="card-header">
+              <h2 className="card-title">
+                {editingContact ? 'Edit Contact' : 'Add New Contact'}
+              </h2>
+            </div>
             
             <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-group">
-                  <label className="form-label">Name *</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="form-input"
-                    placeholder="Contact name"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="form-input"
-                  >
-                    {contactTypes.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.icon} {type.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="form-group">
+                <label className="form-label">Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="form-input"
+                  placeholder="Contact name"
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="form-group">
+                <label className="form-label">Relationship</label>
+                <input
+                  type="text"
+                  value={formData.relationship}
+                  onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
+                  className="form-input"
+                  placeholder="e.g., Family, Friend, Therapist"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-group">
                   <label className="form-label">Phone</label>
                   <input
@@ -214,6 +184,17 @@ const SOSContacts = () => {
                 </div>
               </div>
 
+              <div className="form-group">
+                <label className="form-label">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="form-input"
+                  rows={3}
+                  placeholder="Additional notes or instructions"
+                />
+              </div>
+
               <div className="flex gap-4">
                 <button type="submit" className="btn btn-primary">
                   {editingContact ? 'Update Contact' : 'Add Contact'}
@@ -233,18 +214,18 @@ const SOSContacts = () => {
         <div className="space-y-4">
           {contacts.length === 0 ? (
             <div className="card text-center py-12">
-              <AlertTriangle className="mx-auto mb-4 text-gray-400" size={48} />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">
+              <AlertTriangle className="mx-auto mb-4 text-muted" size={48} />
+              <h3 className="text-lg font-semibold text-muted mb-2">
                 No contacts yet
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-muted mb-6">
                 Add emergency contacts and support resources for quick access
               </p>
               <button
                 onClick={() => setShowForm(true)}
                 className="btn btn-primary"
               >
-                <Plus className="mr-2" size={20} />
+                <Plus size={20} />
                 Add First Contact
               </button>
             </div>
@@ -252,56 +233,59 @@ const SOSContacts = () => {
             contacts.map((contact) => (
               <div key={contact.id} className="card">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-start gap-4">
-                    <div className={`text-2xl ${getContactColor(contact.type)}`}>
-                      {getContactIcon(contact.type)}
-                    </div>
-                    <div className="flex-1">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold">{contact.name}</h3>
-                      <p className={`text-sm ${getContactColor(contact.type)}`}>
-                        {getContactLabel(contact.type)}
-                      </p>
+                      {contact.relationship && (
+                        <span className="px-2 py-1 bg-accent-primary/10 text-accent-primary text-sm rounded-full">
+                          {contact.relationship}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      {contact.phone && (
+                        <div className="flex items-center gap-2">
+                          <Phone size={16} className="text-muted" />
+                          <span className="text-secondary">{contact.phone}</span>
+                          <button
+                            onClick={() => handleCall(contact.phone)}
+                            className="text-accent-primary hover:text-accent-secondary text-sm font-medium"
+                          >
+                            Call
+                          </button>
+                        </div>
+                      )}
                       
-                      <div className="mt-3 space-y-2">
-                        {contact.phone && (
-                          <div className="flex items-center gap-2">
-                            <Phone size={16} className="text-gray-500" />
-                            <span className="text-gray-700">{contact.phone}</span>
-                            <button
-                              onClick={() => handleCall(contact.phone)}
-                              className="text-blue-500 hover:text-blue-700 text-sm font-medium"
-                            >
-                              Call
-                            </button>
-                          </div>
-                        )}
-                        
-                        {contact.email && (
-                          <div className="flex items-center gap-2">
-                            <Mail size={16} className="text-gray-500" />
-                            <span className="text-gray-700">{contact.email}</span>
-                            <button
-                              onClick={() => handleEmail(contact.email)}
-                              className="text-blue-500 hover:text-blue-700 text-sm font-medium"
-                            >
-                              Email
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      {contact.email && (
+                        <div className="flex items-center gap-2">
+                          <Mail size={16} className="text-muted" />
+                          <span className="text-secondary">{contact.email}</span>
+                          <button
+                            onClick={() => handleEmail(contact.email)}
+                            className="text-accent-primary hover:text-accent-secondary text-sm font-medium"
+                          >
+                            Email
+                          </button>
+                        </div>
+                      )}
+                      
+                      {contact.notes && (
+                        <p className="text-muted text-sm mt-2">{contact.notes}</p>
+                      )}
                     </div>
                   </div>
                   
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(contact)}
-                      className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
+                      className="p-2 text-muted hover:text-accent-primary transition-colors"
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(contact.id)}
-                      className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                      className="p-2 text-muted hover:text-accent-danger transition-colors"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -311,7 +295,6 @@ const SOSContacts = () => {
             ))
           )}
         </div>
-
       </div>
     </div>
   );

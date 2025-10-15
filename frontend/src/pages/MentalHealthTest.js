@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Brain, CheckCircle, AlertCircle, TrendingUp, BarChart3 } from 'lucide-react';
+import { Brain, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const MentalHealthTest = () => {
   const [questions, setQuestions] = useState([]);
@@ -14,127 +13,33 @@ const MentalHealthTest = () => {
   const [loading, setLoading] = useState(true);
 
   const scaleOptions = [
-    { value: 0, label: 'Not at all', description: 'Never or rarely' },
-    { value: 1, label: 'Several days', description: 'Less than half the days' },
-    { value: 2, label: 'More than half the days', description: 'More than half the days' },
-    { value: 3, label: 'Nearly every day', description: 'Almost every day' }
+    { value: 0, label: 'Not at all', description: 'I never experience this' },
+    { value: 1, label: 'Rarely', description: 'I experience this very rarely' },
+    { value: 2, label: 'Sometimes', description: 'I experience this occasionally' },
+    { value: 3, label: 'Often', description: 'I experience this frequently' },
+    { value: 4, label: 'Very often', description: 'I experience this almost always' }
   ];
 
   useEffect(() => {
+    fetchQuestions();
     fetchTestHistory();
-    // In a real app, you'd fetch questions from the backend
-    setQuestions(getMentalHealthQuestions());
-    setLoading(false);
   }, []);
 
-  const getMentalHealthQuestions = () => {
-    return [
-      {
-        id: 'mood_low',
-        question: 'Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?',
-        category: 'depression'
-      },
-      {
-        id: 'sleep_problems',
-        question: 'Over the last 2 weeks, how often have you had trouble falling or staying asleep, or sleeping too much?',
-        category: 'depression'
-      },
-      {
-        id: 'energy_low',
-        question: 'Over the last 2 weeks, how often have you felt tired or had little energy?',
-        category: 'depression'
-      },
-      {
-        id: 'appetite_changes',
-        question: 'Over the last 2 weeks, how often have you had poor appetite or overeating?',
-        category: 'depression'
-      },
-      {
-        id: 'concentration_difficulty',
-        question: 'Over the last 2 weeks, how often have you had trouble concentrating on things, such as reading or watching TV?',
-        category: 'depression'
-      },
-      {
-        id: 'self_worth_low',
-        question: 'Over the last 2 weeks, how often have you felt bad about yourself or that you are a failure or have let yourself or your family down?',
-        category: 'depression'
-      },
-      {
-        id: 'interest_loss',
-        question: 'Over the last 2 weeks, how often have you had little interest or pleasure in doing things?',
-        category: 'depression'
-      },
-      {
-        id: 'hopelessness',
-        question: 'Over the last 2 weeks, how often have you felt that things would never get better?',
-        category: 'depression'
-      },
-      {
-        id: 'worry_excessive',
-        question: 'Over the last 2 weeks, how often have you been bothered by feeling nervous, anxious, or on edge?',
-        category: 'anxiety'
-      },
-      {
-        id: 'restlessness',
-        question: 'Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?',
-        category: 'anxiety'
-      },
-      {
-        id: 'fatigue',
-        question: 'Over the last 2 weeks, how often have you been bothered by feeling restless or keyed up or on edge?',
-        category: 'anxiety'
-      },
-      {
-        id: 'irritability',
-        question: 'Over the last 2 weeks, how often have you been bothered by becoming easily annoyed or irritable?',
-        category: 'anxiety'
-      },
-      {
-        id: 'muscle_tension',
-        question: 'Over the last 2 weeks, how often have you been bothered by muscle tension, aches, or soreness?',
-        category: 'anxiety'
-      },
-      {
-        id: 'sleep_disturbance',
-        question: 'Over the last 2 weeks, how often have you been bothered by trouble falling or staying asleep?',
-        category: 'anxiety'
-      },
-      {
-        id: 'concentration_anxiety',
-        question: 'Over the last 2 weeks, how often have you been bothered by trouble concentrating on things?',
-        category: 'anxiety'
-      },
-      {
-        id: 'stress_level',
-        question: 'How would you rate your overall stress level over the past week?',
-        category: 'general'
-      },
-      {
-        id: 'social_support',
-        question: 'How satisfied are you with your current social support system?',
-        category: 'general'
-      },
-      {
-        id: 'coping_ability',
-        question: 'How well do you feel you are coping with daily challenges?',
-        category: 'general'
-      },
-      {
-        id: 'life_satisfaction',
-        question: 'How satisfied are you with your life overall right now?',
-        category: 'general'
-      },
-      {
-        id: 'physical_health',
-        question: 'How would you rate your physical health over the past week?',
-        category: 'general'
-      }
-    ];
+  const fetchQuestions = async () => {
+    try {
+      const response = await axios.get('/mental-health-test/questions');
+      setQuestions(response.data);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      toast.error('Failed to load questions');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchTestHistory = async () => {
     try {
-      const response = await axios.get('/mental-health-test');
+      const response = await axios.get('/mental-health-test/history');
       setTestHistory(response.data);
     } catch (error) {
       console.error('Error fetching test history:', error);
@@ -142,8 +47,10 @@ const MentalHealthTest = () => {
   };
 
   const handleAnswer = (value) => {
-    const questionId = questions[currentQuestion].id;
-    setAnswers({ ...answers, [questionId]: value });
+    setAnswers({
+      ...answers,
+      [questions[currentQuestion]?.id]: value
+    });
   };
 
   const handleNext = () => {
@@ -162,10 +69,9 @@ const MentalHealthTest = () => {
 
   const submitTest = async () => {
     try {
-      const response = await axios.post('/mental-health-test', {
-        responses: answers
+      const response = await axios.post('/mental-health-test/submit', {
+        answers: answers
       });
-      
       setTestResults(response.data);
       setTestCompleted(true);
       fetchTestHistory();
@@ -184,19 +90,14 @@ const MentalHealthTest = () => {
   };
 
   const getScoreInterpretation = (score) => {
-    if (score <= 2) return { level: 'excellent', color: 'text-green-600', bg: 'bg-green-100' };
-    if (score <= 4) return { level: 'good', color: 'text-blue-600', bg: 'bg-blue-100' };
-    if (score <= 6) return { level: 'moderate', color: 'text-yellow-600', bg: 'bg-yellow-100' };
-    if (score <= 8) return { level: 'concerning', color: 'text-orange-600', bg: 'bg-orange-100' };
-    return { level: 'urgent', color: 'text-red-600', bg: 'bg-red-100' };
+    if (score <= 2) return { level: 'excellent', color: 'text-accent-success', bg: 'bg-accent-success/10' };
+    if (score <= 4) return { level: 'good', color: 'text-accent-success', bg: 'bg-accent-success/10' };
+    if (score <= 6) return { level: 'moderate', color: 'text-accent-warning', bg: 'bg-accent-warning/10' };
+    if (score <= 8) return { level: 'concerning', color: 'text-accent-danger', bg: 'bg-accent-danger/10' };
+    return { level: 'critical', color: 'text-accent-danger', bg: 'bg-accent-danger/10' };
   };
 
   const getRecommendations = (score) => {
-    if (score <= 2) return [
-      'Continue your current self-care routine',
-      'Consider helping others who might be struggling',
-      'Maintain your healthy habits'
-    ];
     if (score <= 4) return [
       'Continue practicing mindfulness and self-care',
       'Consider journaling about your experiences',
@@ -224,7 +125,7 @@ const MentalHealthTest = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-96">
+      <div className="loading-container">
         <div className="spinner"></div>
       </div>
     );
@@ -235,10 +136,10 @@ const MentalHealthTest = () => {
     const recommendations = getRecommendations(testResults.score);
 
     return (
-      <div className="mental-health-test-page">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Test Results</h1>
-          <p className="text-white/90">Your mental health assessment is complete</p>
+      <div className="main-content fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Test Results</h1>
+          <p className="page-subtitle">Your mental health assessment is complete</p>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
@@ -250,7 +151,7 @@ const MentalHealthTest = () => {
             <p className={`text-lg font-semibold ${interpretation.color} mb-4`}>
               {interpretation.level.charAt(0).toUpperCase() + interpretation.level.slice(1)} Mental Health
             </p>
-            <p className="text-gray-600">
+            <p className="text-secondary">
               {testResults.score <= 2 && "Your mental health appears to be in excellent condition. Keep up the great work!"}
               {testResults.score > 2 && testResults.score <= 4 && "Your mental health is in good shape overall. You're managing well!"}
               {testResults.score > 4 && testResults.score <= 6 && "You're experiencing some challenges with your mental health. This is common and manageable with the right support."}
@@ -261,43 +162,17 @@ const MentalHealthTest = () => {
 
           <div className="card">
             <h3 className="text-xl font-semibold mb-4 flex items-center">
-              <CheckCircle className="mr-2 text-green-500" size={20} />
+              <CheckCircle className="mr-2 text-accent-success" size={20} />
               Recommendations
             </h3>
             <ul className="space-y-2">
               {recommendations.map((rec, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="text-blue-500 mr-2">•</span>
+                  <span className="text-accent-primary mr-2">•</span>
                   <span>{rec}</span>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="card">
-            <h3 className="text-xl font-semibold mb-4 flex items-center">
-              <TrendingUp className="mr-2 text-blue-500" size={20} />
-              Your Progress
-            </h3>
-            {testHistory.length > 1 ? (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={testHistory.map((test, index) => ({
-                    test: `Test ${testHistory.length - index}`,
-                    score: test.score,
-                    date: new Date(test.created_at).toLocaleDateString()
-                  }))}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="test" />
-                    <YAxis domain={[0, 10]} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="score" stroke="#667eea" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <p className="text-gray-600">Take more tests to see your progress over time.</p>
-            )}
           </div>
 
           <div className="text-center">
@@ -311,14 +186,10 @@ const MentalHealthTest = () => {
   }
 
   return (
-    <div className="mental-health-test-page fade-in">
-      <div className="text-center mb-12">
-        <div className="floating">
-          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-            <span className="gradient-text">Mental Health Assessment</span>
-          </h1>
-        </div>
-        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+    <div className="main-content fade-in">
+      <div className="page-header">
+        <h1 className="page-title">Mental Health Assessment</h1>
+        <p className="page-subtitle">
           A comprehensive evaluation of your mental well-being designed to provide insights and support your mental health journey.
         </p>
       </div>
@@ -330,13 +201,13 @@ const MentalHealthTest = () => {
               <h2 className="text-xl font-semibold">
                 Question {currentQuestion + 1} of {questions.length}
               </h2>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted">
                 {Math.round(((currentQuestion + 1) / questions.length) * 100)}% Complete
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-border-color rounded-full h-2">
               <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-accent-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
               ></div>
             </div>
@@ -354,26 +225,26 @@ const MentalHealthTest = () => {
                   onClick={() => handleAnswer(option.value)}
                   className={`w-full p-6 text-left border-2 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
                     answers[questions[currentQuestion]?.id] === option.value
-                      ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      ? 'border-accent-primary bg-accent-primary/10 shadow-lg'
+                      : 'border-border-color hover:border-border-hover hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                         answers[questions[currentQuestion]?.id] === option.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-accent-primary text-white'
+                          : 'bg-bg-tertiary text-muted'
                       }`}>
                         {option.value}
                       </div>
                       <div>
                         <div className="font-semibold text-lg">{option.label}</div>
-                        <div className="text-gray-600">{option.description}</div>
+                        <div className="text-muted">{option.description}</div>
                       </div>
                     </div>
                     {answers[questions[currentQuestion]?.id] === option.value && (
-                      <div className="flex items-center gap-2 text-blue-500">
+                      <div className="flex items-center gap-2 text-accent-primary">
                         <CheckCircle size={24} />
                         <span className="font-medium">Selected</span>
                       </div>
@@ -390,6 +261,7 @@ const MentalHealthTest = () => {
               disabled={currentQuestion === 0}
               className="btn btn-secondary"
             >
+              <ArrowLeft size={16} />
               Previous
             </button>
             <button
@@ -398,10 +270,10 @@ const MentalHealthTest = () => {
               className="btn btn-primary"
             >
               {currentQuestion === questions.length - 1 ? 'Complete Test' : 'Next'}
+              {currentQuestion < questions.length - 1 && <ArrowRight size={16} />}
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
