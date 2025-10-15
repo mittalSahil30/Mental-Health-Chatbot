@@ -132,142 +132,143 @@ const Journal = () => {
           </p>
         </div>
 
-      <div className="max-w-4xl mx-auto">
-        {!showForm ? (
-          <div className="text-center mb-8">
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn btn-primary text-lg px-8 py-4"
-            >
-              <Plus className="mr-2" size={20} />
-              New Entry
-            </button>
-          </div>
-        ) : (
-          <div className="card mb-8">
-            <div className="card-header">
-              <h2 className="card-title">
-                {editingEntry ? 'Edit Entry' : 'New Journal Entry'}
-              </h2>
-            </div>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="form-input"
-                  placeholder="What's on your mind today?"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">How are you feeling?</label>
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-                  {moods.map((mood) => (
-                    <button
-                      key={mood.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, mood: mood.value })}
-                      className={`p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                        formData.mood === mood.value
-                          ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                      }`}
-                    >
-                      <div className="text-3xl mb-2">{mood.emoji}</div>
-                      <div className="text-xs font-medium text-gray-700">{mood.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Content</label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="form-input"
-                  rows={6}
-                  placeholder="Write about your day, thoughts, or anything you'd like to remember..."
-                  required
-                />
-              </div>
-
-              <div className="flex gap-4">
-                <button type="submit" className="btn btn-primary">
-                  {editingEntry ? 'Update Entry' : 'Save Entry'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="btn btn-secondary"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        <div className="space-y-6">
-          {entries.length === 0 ? (
-            <div className="card text-center py-12">
-              <Heart className="mx-auto mb-4 text-gray-400" size={48} />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                No entries yet
-              </h3>
-              <p className="text-gray-500 mb-6">
-                Start your journaling journey by creating your first entry
-              </p>
+        <div className="max-w-4xl mx-auto">
+          {!showForm ? (
+            <div className="text-center mb-8">
               <button
                 onClick={() => setShowForm(true)}
-                className="btn btn-primary"
+                className="btn btn-primary text-lg px-8 py-4"
               >
                 <Plus className="mr-2" size={20} />
-                Create First Entry
+                New Entry
               </button>
             </div>
           ) : (
-            entries.map((entry) => (
-              <div key={entry.id} className="card">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{getMoodEmoji(entry.mood)}</span>
-                    <div>
-                      <h3 className="text-lg font-semibold">{entry.title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar size={14} />
-                        <span>{format(new Date(entry.created_at), 'MMM dd, yyyy - h:mm a')}</span>
+            <div className="card mb-8">
+              <div className="card-header">
+                <h2 className="card-title">
+                  {editingEntry ? 'Edit Entry' : 'New Journal Entry'}
+                </h2>
+              </div>
+              
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label className="form-label">Title</label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="form-input"
+                    placeholder="What's on your mind today?"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">How are you feeling?</label>
+                  <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                    {moods.map((mood) => (
+                      <button
+                        key={mood.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, mood: mood.value })}
+                        className={`p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
+                          formData.mood === mood.value
+                            ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg'
+                            : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="text-3xl mb-2">{mood.emoji}</div>
+                        <div className="text-xs font-medium text-gray-700">{mood.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Content</label>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    className="form-input resize-none"
+                    rows={6}
+                    placeholder="Write about your day, thoughts, or anything you'd like to remember..."
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <button type="submit" className="btn btn-primary">
+                    {editingEntry ? 'Update Entry' : 'Save Entry'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="btn btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            {entries.length === 0 ? (
+              <div className="card text-center py-12">
+                <Heart className="mx-auto mb-4 text-gray-400" size={48} />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                  No entries yet
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  Start your journaling journey by creating your first entry
+                </p>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="btn btn-primary"
+                >
+                  <Plus className="mr-2" size={20} />
+                  Create First Entry
+                </button>
+              </div>
+            ) : (
+              entries.map((entry) => (
+                <div key={entry.id} className="card">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{getMoodEmoji(entry.mood)}</span>
+                      <div>
+                        <h3 className="text-lg font-semibold">{entry.title}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Calendar size={14} />
+                          <span>{format(new Date(entry.created_at), 'MMM dd, yyyy - h:mm a')}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(entry)}
+                        className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(entry.id)}
+                        className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(entry)}
-                      className="p-2 text-gray-500 hover:text-blue-500 transition-colors"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(entry.id)}
-                      className="p-2 text-gray-500 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                  <div className="prose max-w-none">
+                    <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {entry.content}
+                    </p>
                   </div>
                 </div>
-                <div className="prose max-w-none">
-                  <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                    {entry.content}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
