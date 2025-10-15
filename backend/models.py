@@ -59,9 +59,10 @@ class SOSContact(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    phone = Column(String)
-    email = Column(String)
-    type = Column(String)  # emergency, therapist, family, friend, etc.
+    phone = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    relationship = Column(String, nullable=True)
+    notes = Column(Text, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     

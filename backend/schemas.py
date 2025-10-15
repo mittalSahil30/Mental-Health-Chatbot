@@ -19,7 +19,7 @@ class UserResponse(BaseModel):
     is_guest: bool
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Journal schemas
 class JournalCreate(BaseModel):
@@ -35,7 +35,7 @@ class JournalResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Mental Health Test schemas
 class MentalHealthTestCreate(BaseModel):
@@ -48,7 +48,7 @@ class MentalHealthTestResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Mindfulness Exercise schemas
 class MindfulnessExerciseResponse(BaseModel):
@@ -61,19 +61,21 @@ class MindfulnessExerciseResponse(BaseModel):
 # SOS Contact schemas
 class SOSContactCreate(BaseModel):
     name: str
-    phone: str
-    email: str
-    type: str
+    phone: Optional[str] = ""
+    email: Optional[str] = ""
+    relationship: Optional[str] = ""
+    notes: Optional[str] = ""
 
 class SOSContactResponse(BaseModel):
     id: int
     name: str
-    phone: str
-    email: str
-    type: str
+    phone: Optional[str]
+    email: Optional[str]
+    relationship: Optional[str]
+    notes: Optional[str]
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Chat Message schemas
 class ChatMessageCreate(BaseModel):
@@ -87,4 +89,4 @@ class ChatMessageResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        from_attributes = True
+        orm_mode = True

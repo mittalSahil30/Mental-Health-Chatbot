@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios defaults
   useEffect(() => {
+    axios.defaults.baseURL = 'http://localhost:8002';
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
@@ -107,11 +108,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updateProfile = async (username) => {
+  const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('/profile', null, {
-        params: { username }
-      });
+      const response = await axios.put('/profile', profileData);
       setUser(response.data);
       return { success: true };
     } catch (error) {
@@ -122,6 +121,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
+
   const value = {
     user,
     loading,
@@ -129,7 +132,8 @@ export const AuthProvider = ({ children }) => {
     register,
     createGuestUser,
     logout,
-    updateProfile
+    updateProfile,
+    updateUser
   };
 
   return (

@@ -127,11 +127,15 @@ async def get_profile(current_user: User = Depends(get_current_user)):
 
 @app.put("/profile", response_model=UserResponse)
 async def update_profile(
-    username: str,
+    profile_data: dict,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    current_user.username = username
+    if "username" in profile_data:
+        current_user.username = profile_data["username"]
+    if "email" in profile_data:
+        current_user.email = profile_data["email"]
+    
     db.commit()
     db.refresh(current_user)
     
@@ -181,17 +185,112 @@ async def get_journal_entries(
         created_at=entry.created_at
     ) for entry in entries]
 
-# Mental Health Test endpoints
-@app.post("/mental-health-test", response_model=MentalHealthTestResponse)
-async def submit_mental_health_test(
-    test_data: MentalHealthTestCreate,
+@app.put("/journal/{journal_id}", response_model=JournalResponse)
+async def update_journal_entry(
+    journal_id: int,
+    journal: JournalCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    score = calculate_mental_health_score(test_data.responses)
+    db_journal = db.query(Journal).filter(Journal.id == journal_id, Journal.user_id == current_user.id).first()
+    if not db_journal:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+    
+    db_journal.title = journal.title
+    db_journal.content = journal.content
+    db_journal.mood = journal.mood
+    db.commit()
+    db.refresh(db_journal)
+    
+    return JournalResponse(
+        id=db_journal.id,
+        title=db_journal.title,
+        content=db_journal.content,
+        mood=db_journal.mood,
+        created_at=db_journal.created_at
+    )
+
+@app.delete("/journal/{journal_id}")
+async def delete_journal_entry(
+    journal_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_journal = db.query(Journal).filter(Journal.id == journal_id, Journal.user_id == current_user.id).first()
+    if not db_journal:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+    
+    db.delete(db_journal)
+    db.commit()
+    return {"message": "Journal entry deleted successfully"}
+
+# Mental Health Test endpoints
+@app.get("/mental-health-test/questions")
+async def get_mental_health_questions():
+    questions = [
+        {
+            "id": "q1",
+            "question": "How often do you feel overwhelmed by daily tasks?",
+            "category": "stress"
+        },
+        {
+            "id": "q2", 
+            "question": "How often do you feel sad or down?",
+            "category": "mood"
+        },
+        {
+            "id": "q3",
+            "question": "How often do you have trouble sleeping?",
+            "category": "sleep"
+        },
+        {
+            "id": "q4",
+            "question": "How often do you feel anxious or worried?",
+            "category": "anxiety"
+        },
+        {
+            "id": "q5",
+            "question": "How often do you feel isolated or lonely?",
+            "category": "social"
+        },
+        {
+            "id": "q6",
+            "question": "How often do you have trouble concentrating?",
+            "category": "focus"
+        },
+        {
+            "id": "q7",
+            "question": "How often do you feel hopeless about the future?",
+            "category": "hope"
+        },
+        {
+            "id": "q8",
+            "question": "How often do you feel irritable or angry?",
+            "category": "mood"
+        },
+        {
+            "id": "q9",
+            "question": "How often do you avoid social situations?",
+            "category": "social"
+        },
+        {
+            "id": "q10",
+            "question": "How often do you feel like you have no energy?",
+            "category": "energy"
+        }
+    ]
+    return questions
+
+@app.post("/mental-health-test/submit", response_model=dict)
+async def submit_mental_health_test(
+    answers: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    score = calculate_mental_health_score(answers)
     
     db_test = MentalHealthTest(
-        responses=test_data.responses,
+        responses=answers,
         score=score,
         user_id=current_user.id
     )
@@ -199,14 +298,13 @@ async def submit_mental_health_test(
     db.commit()
     db.refresh(db_test)
     
-    return MentalHealthTestResponse(
-        id=db_test.id,
-        responses=db_test.responses,
-        score=db_test.score,
-        created_at=db_test.created_at
-    )
+    return {
+        "id": db_test.id,
+        "score": db_test.score,
+        "created_at": db_test.created_at
+    }
 
-@app.get("/mental-health-test", response_model=list[MentalHealthTestResponse])
+@app.get("/mental-health-test/history", response_model=list[MentalHealthTestResponse])
 async def get_mental_health_tests(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -220,12 +318,12 @@ async def get_mental_health_tests(
     ) for test in tests]
 
 # Mindfulness Exercises endpoints
-@app.get("/mindfulness-exercises", response_model=list[MindfulnessExerciseResponse])
+@app.get("/mindfulness/exercises", response_model=list[MindfulnessExerciseResponse])
 async def get_mindfulness_exercises():
     exercises = [
         {
             "id": 1,
-            "title": "Deep Breathing",
+            "title": "Breathing Exercise",
             "description": "Focus on your breath and take slow, deep breaths",
             "duration": 5,
             "instructions": "Sit comfortably, close your eyes, and breathe in for 4 counts, hold for 4 counts, and breathe out for 6 counts. Repeat for 5 minutes."
@@ -265,7 +363,8 @@ async def create_sos_contact(
         name=contact.name,
         phone=contact.phone,
         email=contact.email,
-        type=contact.type,
+        relationship=contact.relationship,
+        notes=contact.notes,
         user_id=current_user.id
     )
     db.add(db_contact)
@@ -277,7 +376,8 @@ async def create_sos_contact(
         name=db_contact.name,
         phone=db_contact.phone,
         email=db_contact.email,
-        type=db_contact.type
+        relationship=db_contact.relationship,
+        notes=db_contact.notes
     )
 
 @app.get("/sos-contacts", response_model=list[SOSContactResponse])
@@ -291,8 +391,51 @@ async def get_sos_contacts(
         name=contact.name,
         phone=contact.phone,
         email=contact.email,
-        type=contact.type
+        relationship=contact.relationship,
+        notes=contact.notes
     ) for contact in contacts]
+
+@app.put("/sos-contacts/{contact_id}", response_model=SOSContactResponse)
+async def update_sos_contact(
+    contact_id: int,
+    contact: SOSContactCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_contact = db.query(SOSContact).filter(SOSContact.id == contact_id, SOSContact.user_id == current_user.id).first()
+    if not db_contact:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    
+    db_contact.name = contact.name
+    db_contact.phone = contact.phone
+    db_contact.email = contact.email
+    db_contact.relationship = contact.relationship
+    db_contact.notes = contact.notes
+    db.commit()
+    db.refresh(db_contact)
+    
+    return SOSContactResponse(
+        id=db_contact.id,
+        name=db_contact.name,
+        phone=db_contact.phone,
+        email=db_contact.email,
+        relationship=db_contact.relationship,
+        notes=db_contact.notes
+    )
+
+@app.delete("/sos-contacts/{contact_id}")
+async def delete_sos_contact(
+    contact_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_contact = db.query(SOSContact).filter(SOSContact.id == contact_id, SOSContact.user_id == current_user.id).first()
+    if not db_contact:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    
+    db.delete(db_contact)
+    db.commit()
+    return {"message": "Contact deleted successfully"}
 
 # Chatbot endpoints
 @app.post("/chat", response_model=ChatMessageResponse)

@@ -69,9 +69,7 @@ const MentalHealthTest = () => {
 
   const submitTest = async () => {
     try {
-      const response = await axios.post('/mental-health-test/submit', {
-        answers: answers
-      });
+      const response = await axios.post('/mental-health-test/submit', answers);
       setTestResults(response.data);
       setTestCompleted(true);
       fetchTestHistory();
