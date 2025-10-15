@@ -99,11 +99,15 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="chatbot-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Mental Health Chatbot</h1>
-        <p className="text-white/90">
-          Your AI companion for mental health support and guidance
+    <div className="chatbot-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">Mental Health Chatbot</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          Your AI companion for mental health support and guidance. I'm here to listen, support, and help you through whatever you're experiencing.
         </p>
       </div>
 
@@ -166,29 +170,35 @@ const Chatbot = () => {
         </form>
       </div>
 
-      <div className="mt-8 max-w-4xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <Bot className="mx-auto mb-4 text-blue-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">24/7 Support</h3>
-            <p className="text-gray-600 text-sm">
-              Available anytime you need someone to talk to
+      <div className="mt-12 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="card text-center scale-in" style={{ animationDelay: '0.2s' }}>
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Bot className="text-white" size={32} />
+            </div>
+            <h3 className="text-xl font-bold mb-3 gradient-text">24/7 Support</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Available anytime you need someone to talk to, providing immediate support whenever you need it most.
             </p>
           </div>
 
-          <div className="card text-center">
-            <Heart className="mx-auto mb-4 text-pink-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Personalized</h3>
-            <p className="text-gray-600 text-sm">
-              Responses tailored to your unique situation
+          <div className="card text-center scale-in" style={{ animationDelay: '0.3s' }}>
+            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Heart className="text-white" size={32} />
+            </div>
+            <h3 className="text-xl font-bold mb-3 gradient-text">Personalized</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Responses tailored to your unique situation, learning from your interactions to provide better support.
             </p>
           </div>
 
-          <div className="card text-center">
-            <Shield className="mx-auto mb-4 text-green-500" size={32} />
-            <h3 className="text-lg font-semibold mb-2">Safe Space</h3>
-            <p className="text-gray-600 text-sm">
-              Confidential and judgment-free conversations
+          <div className="card text-center scale-in" style={{ animationDelay: '0.4s' }}>
+            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Shield className="text-white" size={32} />
+            </div>
+            <h3 className="text-xl font-bold mb-3 gradient-text">Safe Space</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Confidential and judgment-free conversations in a secure, supportive environment designed for your well-being.
             </p>
           </div>
         </div>

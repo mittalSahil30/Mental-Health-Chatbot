@@ -68,19 +68,21 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="dashboard-page">
+    <div className="dashboard-page fade-in">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-white mb-4">
-          Welcome back, {user?.username}!
-        </h1>
-        <p className="text-xl text-white/90 mb-6">
-          Your mental health journey continues here
+        <div className="floating">
+          <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            Welcome back, <span className="gradient-text">{user?.username}</span>!
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+          Your mental health journey continues here. Take a moment to check in with yourself and explore the tools designed to support your well-being.
         </p>
         {user?.is_guest && (
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg max-w-md mx-auto">
-            <div className="flex items-center">
-              <Shield className="mr-2" size={20} />
-              <span className="text-sm">
+          <div className="glass-card max-w-lg mx-auto p-6 border-l-4 border-yellow-400">
+            <div className="flex items-center justify-center">
+              <Shield className="mr-3 text-yellow-600" size={24} />
+              <span className="text-yellow-800 font-semibold">
                 You're using a guest account. Register to access all features.
               </span>
             </div>
@@ -93,7 +95,8 @@ const Dashboard = () => {
           <Link
             key={index}
             to={feature.available ? feature.link : '#'}
-            className={`dashboard-card ${!feature.available ? 'opacity-60 cursor-not-allowed' : ''}`}
+            className={`dashboard-card scale-in ${!feature.available ? 'opacity-60 cursor-not-allowed' : ''}`}
+            style={{ animationDelay: `${index * 0.1}s` }}
             onClick={(e) => {
               if (!feature.available) {
                 e.preventDefault();
@@ -106,9 +109,9 @@ const Dashboard = () => {
             <h3 className="dashboard-card-title">{feature.title}</h3>
             <p className="dashboard-card-description">{feature.description}</p>
             {!feature.available && (
-              <div className="mt-4 p-2 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-600 text-center">
-                  <Shield className="inline-block mr-1" size={16} />
+              <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                <p className="text-sm text-yellow-700 text-center font-medium">
+                  <Shield className="inline-block mr-2" size={16} />
                   Requires registration
                 </p>
               </div>
@@ -117,45 +120,54 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card text-center">
-          <Calendar className="mx-auto mb-4 text-blue-500" size={32} />
-          <h3 className="text-lg font-semibold mb-2">Daily Check-ins</h3>
-          <p className="text-gray-600">
-            Track your mood and well-being with our daily assessment tools
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="card text-center scale-in" style={{ animationDelay: '0.6s' }}>
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Calendar className="text-white" size={32} />
+          </div>
+          <h3 className="text-xl font-bold mb-3 gradient-text">Daily Check-ins</h3>
+          <p className="text-gray-600 leading-relaxed">
+            Track your mood and well-being with our daily assessment tools designed to help you stay connected with your mental health.
           </p>
         </div>
 
-        <div className="card text-center">
-          <TrendingUp className="mx-auto mb-4 text-green-500" size={32} />
-          <h3 className="text-lg font-semibold mb-2">Progress Tracking</h3>
-          <p className="text-gray-600">
-            Monitor your mental health journey with personalized insights
+        <div className="card text-center scale-in" style={{ animationDelay: '0.7s' }}>
+          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <TrendingUp className="text-white" size={32} />
+          </div>
+          <h3 className="text-xl font-bold mb-3 gradient-text">Progress Tracking</h3>
+          <p className="text-gray-600 leading-relaxed">
+            Monitor your mental health journey with personalized insights and visual progress tracking that celebrates your growth.
           </p>
         </div>
 
-        <div className="card text-center">
-          <Shield className="mx-auto mb-4 text-purple-500" size={32} />
-          <h3 className="text-lg font-semibold mb-2">Privacy First</h3>
-          <p className="text-gray-600">
-            Your data is encrypted and secure. We prioritize your privacy
+        <div className="card text-center scale-in" style={{ animationDelay: '0.8s' }}>
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Shield className="text-white" size={32} />
+          </div>
+          <h3 className="text-xl font-bold mb-3 gradient-text">Privacy First</h3>
+          <p className="text-gray-600 leading-relaxed">
+            Your data is encrypted and secure. We prioritize your privacy and ensure your personal information stays confidential.
           </p>
         </div>
       </div>
 
       {user?.is_guest && (
-        <div className="mt-8 text-center">
-          <div className="card max-w-2xl mx-auto">
-            <h3 className="text-xl font-semibold mb-4">Ready to unlock all features?</h3>
-            <p className="text-gray-600 mb-6">
+        <div className="mt-16 text-center">
+          <div className="card max-w-3xl mx-auto scale-in" style={{ animationDelay: '0.9s' }}>
+            <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Shield className="text-white" size={40} />
+            </div>
+            <h3 className="text-2xl font-bold mb-4 gradient-text">Ready to unlock all features?</h3>
+            <p className="text-gray-600 mb-8 text-lg leading-relaxed max-w-2xl mx-auto">
               Create a free account to access your personal journal, mental health assessments, 
-              mindfulness exercises, and more personalized features.
+              mindfulness exercises, and more personalized features designed to support your mental health journey.
             </p>
-            <div className="flex gap-4 justify-center">
-              <Link to="/register" className="btn btn-primary">
+            <div className="flex gap-6 justify-center">
+              <Link to="/register" className="btn btn-primary text-lg px-8 py-4">
                 Create Account
               </Link>
-              <Link to="/login" className="btn btn-secondary">
+              <Link to="/login" className="btn btn-secondary text-lg px-8 py-4">
                 Sign In
               </Link>
             </div>

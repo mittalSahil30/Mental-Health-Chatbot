@@ -198,11 +198,15 @@ const MindfulnessExercises = () => {
   }
 
   return (
-    <div className="mindfulness-exercises-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Mindfulness Exercises</h1>
-        <p className="text-white/90">
-          Practice meditation and mindfulness for better well-being
+    <div className="mindfulness-exercises-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">Mindfulness Exercises</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          Practice meditation and mindfulness techniques designed to enhance your well-being and bring peace to your daily life.
         </p>
       </div>
 

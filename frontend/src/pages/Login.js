@@ -53,11 +53,15 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
-      <div className="text-center mb-8">
-        <Heart className="mx-auto mb-4" size={48} color="#667eea" />
+    <div className="form-container scale-in">
+      <div className="text-center mb-10">
+        <div className="floating">
+          <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Heart className="text-white" size={40} />
+          </div>
+        </div>
         <h1 className="form-title">Welcome Back</h1>
-        <p className="form-subtitle">Sign in to your account to continue your mental health journey</p>
+        <p className="form-subtitle">Sign in to your account to continue your mental health journey and access personalized features</p>
       </div>
 
       <form onSubmit={handleSubmit}>

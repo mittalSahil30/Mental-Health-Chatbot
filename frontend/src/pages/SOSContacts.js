@@ -131,11 +131,15 @@ const SOSContacts = () => {
   }
 
   return (
-    <div className="sos-contacts-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">SOS Contacts</h1>
-        <p className="text-white/90">
-          Emergency contacts and crisis support resources
+    <div className="sos-contacts-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">SOS Contacts</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          Emergency contacts and crisis support resources to ensure you have immediate access to help when you need it most.
         </p>
       </div>
 

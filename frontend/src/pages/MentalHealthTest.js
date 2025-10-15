@@ -311,11 +311,15 @@ const MentalHealthTest = () => {
   }
 
   return (
-    <div className="mental-health-test-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Mental Health Assessment</h1>
-        <p className="text-white/90">
-          A comprehensive evaluation of your mental well-being
+    <div className="mental-health-test-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">Mental Health Assessment</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          A comprehensive evaluation of your mental well-being designed to provide insights and support your mental health journey.
         </p>
       </div>
 

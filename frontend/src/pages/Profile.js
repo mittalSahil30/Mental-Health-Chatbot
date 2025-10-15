@@ -46,22 +46,26 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Profile Settings</h1>
-        <p className="text-white/90">
-          Manage your account and personalize your experience
+    <div className="profile-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">Profile Settings</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          Manage your account and personalize your experience to make the most of your mental health journey.
         </p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <div className="card">
+        <div className="card scale-in">
           <div className="text-center mb-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg floating">
               <User className="text-white" size={40} />
             </div>
-            <h2 className="text-2xl font-bold">{user?.username}</h2>
-            <p className="text-gray-600">{user?.email}</p>
+            <h2 className="text-2xl font-bold gradient-text">{user?.username}</h2>
+            <p className="text-gray-600 text-lg">{user?.email}</p>
           </div>
 
           <div className="space-y-6">

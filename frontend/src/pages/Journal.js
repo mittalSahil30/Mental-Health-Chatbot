@@ -119,11 +119,15 @@ const Journal = () => {
   }
 
   return (
-    <div className="journal-page">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Personal Journal</h1>
-        <p className="text-white/90">
-          Record your thoughts, feelings, and daily experiences
+    <div className="journal-page fade-in">
+      <div className="text-center mb-12">
+        <div className="floating">
+          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+            <span className="gradient-text">Personal Journal</span>
+          </h1>
+        </div>
+        <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+          Record your thoughts, feelings, and daily experiences in your private space for reflection and growth.
         </p>
       </div>
 
@@ -159,20 +163,20 @@ const Journal = () => {
 
               <div className="form-group">
                 <label className="form-label">How are you feeling?</label>
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                   {moods.map((mood) => (
                     <button
                       key={mood.value}
                       type="button"
                       onClick={() => setFormData({ ...formData, mood: mood.value })}
-                      className={`p-3 rounded-lg border-2 transition-all ${
+                      className={`p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
                         formData.mood === mood.value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg'
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                     >
-                      <div className="text-2xl mb-1">{mood.emoji}</div>
-                      <div className="text-xs text-gray-600">{mood.label}</div>
+                      <div className="text-3xl mb-2">{mood.emoji}</div>
+                      <div className="text-xs font-medium text-gray-700">{mood.label}</div>
                     </button>
                   ))}
                 </div>
